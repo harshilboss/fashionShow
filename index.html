@@ -117,9 +117,9 @@
     <h3>Top</h3>
     <div class="slider-container" ontouchstart="startTouch(event, 'top')" ontouchend="endTouch(event, 'top')">
       <div class="slider" id="topSlider">
-        <img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTFbnFFMRWVNR1qJ53e978srp-yxizR-BFeC8POV_2jUtbdzrFOyoroTY1NYh437tyW_Z6_2Ojv3W1Oc7nxkEe0mYM0gkvbBJC35URoNbXM3UmHO4BPfv2bqg" alt="Top 1">
-        <img src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQ4wWhJ8ns6T9xw6G0P7J7lrLAJSaZL14vHrynK7FiZyvYlfOI0YiNoVnsWFKTR7j_6ewC6U8kFcboFq6R4nXEZ-uRlRF3sWPxR_tv8vI5UJjz9To2ovcl3VA" alt="Top 2">
-        <img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRlCxRcIGWqtZcW5voakrIyLacLogVeA5u2Qsl5iPUDls__bk1eXTwtXs-9XQrn_PPQ9l6wT79BPZfouDwJUCwe9O--2ObBt4js7Es42blcEdUq1Um-ySSJFA" alt="Top 3">
+        <img src="https://via.placeholder.com/400x600?text=Top+1" alt="Top 1">
+        <img src="https://via.placeholder.com/400x600?text=Top+2" alt="Top 2">
+        <img src="https://via.placeholder.com/400x600?text=Top+3" alt="Top 3">
       </div>
     </div>
     <div class="controls">
@@ -130,9 +130,9 @@
     <h3>Bottom</h3>
     <div class="slider-container" ontouchstart="startTouch(event, 'bottom')" ontouchend="endTouch(event, 'bottom')">
       <div class="slider" id="bottomSlider">
-        <img src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRg7HvFnWxJKWsROo0Bi1HeGrsSAljpvkZx_JaV5XCe6kNZMzPx71XEEw5SMJbDZ37u-2enhSndmFWPu5MQRMAD2xPwrbIjdqnzKN95Vgk" alt="Bottom 1">
-        <img src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSk7ka60QIl72DuyTeWWhZBfiGUAIfBlR0LrFnQOmkHaEtBBifpWJnm6xrgpiyUtagCO897l97RJ51I3nF10Ic7bG2e_-xvDYlVB2jPlGuGnBQI8Zl0J14qXw" alt="Bottom 2">
-        <img src="https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS34YA3DjfQyzMfXsHfU6jTNkHLlCfeWYQszzrMUy1_URWnlYB9ySSOGl487K7K-YP0ktJBkPjmj95cC32AFqwCn6DJEpTa1LR72-Lau5k" alt="Bottom 3">
+        <img src="https://via.placeholder.com/400x600?text=Bottom+1" alt="Bottom 1">
+        <img src="https://via.placeholder.com/400x600?text=Bottom+2" alt="Bottom 2">
+        <img src="https://via.placeholder.com/400x600?text=Bottom+3" alt="Bottom 3">
       </div>
     </div>
     <div class="controls">
@@ -159,5 +159,68 @@
       </label>
     </div>
   </div>
+
+  <script>
+    const serverURL = "https://your-render-server-url.onrender.com/sendCommand";
+    let topIndex = 0;
+    let bottomIndex = 0;
+    const topSlider = document.getElementById('topSlider');
+    const bottomSlider = document.getElementById('bottomSlider');
+
+    function updateSlider(slider, index) {
+      slider.style.transform = `translateX(-${index * 100}%)`;
+    }
+
+    function sendCommand(command) {
+      fetch(serverURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command })
+      });
+    }
+
+    function changeTop(dir) {
+      topIndex = (topIndex + dir + topSlider.children.length) % topSlider.children.length;
+      updateSlider(topSlider, topIndex);
+      sendCommand(dir > 0 ? 'topNext' : 'topPrev');
+    }
+
+    function changeBottom(dir) {
+      bottomIndex = (bottomIndex + dir + bottomSlider.children.length) % bottomSlider.children.length;
+      updateSlider(bottomSlider, bottomIndex);
+      sendCommand(dir > 0 ? 'bottomNext' : 'bottomPrev');
+    }
+
+    function sendColor() {
+      const r = document.getElementById('r').value;
+      const g = document.getElementById('g').value;
+      const b = document.getElementById('b').value;
+      sendCommand(`color:${r},${g},${b}`);
+    }
+
+    function sendSize() {
+      const size = document.getElementById('sizeSelect').value;
+      sendCommand(`size:${size}`);
+    }
+
+    let touchStartX = 0;
+
+    function startTouch(e, type) {
+      touchStartX = e.changedTouches[0].screenX;
+    }
+
+    function endTouch(e, type) {
+      const endX = e.changedTouches[0].screenX;
+      const diff = endX - touchStartX;
+
+      if (Math.abs(diff) > 50) {
+        if (type === 'top') {
+          changeTop(diff < 0 ? 1 : -1);
+        } else {
+          changeBottom(diff < 0 ? 1 : -1);
+        }
+      }
+    }
+  </script>
 </body>
 </html>
